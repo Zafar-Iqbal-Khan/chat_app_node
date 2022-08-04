@@ -36,7 +36,7 @@ io.on("connection", (socket) => {
 });
 
 
-app.get("/",(req,res)=>{
+app.get("/home",(req,res)=>{
   res.status(200).json({msg:"hello world i am going to deploy my first node js app"});
 })
 
