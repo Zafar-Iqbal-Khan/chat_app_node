@@ -47,7 +47,7 @@ app.get("/home",(req,res)=>{
  app.get("/about",(req,res)=>{
   res.send('<h1>Hello Express! welcome to about</h1>')
  })
-server.listen(3000,()=> {
+server.listen(process.env.PORT || 3000,()=> {
   console.log("listening on*:3000");
 });
 
