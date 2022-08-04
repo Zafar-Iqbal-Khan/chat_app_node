@@ -36,12 +36,18 @@ io.on("connection", (socket) => {
 });
 
 
-app.get("/home",(req,res)=>{
-  res.status(200).json({msg:"hello world i am going to deploy my first node js app"});
+app.get("/",(req,res)=>{
+ res.send('<h1>Hello Express!</h1>')
 })
 
+app.get("/home",(req,res)=>{
+  res.send('<h1>Hello Express! welcome to home</h1>')
+ })
 
-server.listen(3000,"0.0.0.0",()=> {
+ app.get("/about",(req,res)=>{
+  res.send('<h1>Hello Express! welcome to about</h1>')
+ })
+server.listen(3000,()=> {
   console.log("listening on*:3000");
 });
 
