@@ -5,13 +5,22 @@ const server = http.createServer(app);
 const { Server } = require("socket.io");
 // const io = new Server(server);
 var io = require("socket.io")(server);
+const formatMessage = require("./utils/messages");
+
+const {
+  userJoin,
+  getCurrentUser,
+  userLeave,
+  getRoomUsers,
+} = require("./utils/users");
 const messages = [];
 
 var clients = {};
+const botName = "Some Bot";
 
 app.use(express.json());
 io.on("connection", (socket) => {
-  console.log("connected with flutter");
+  console.log("connected with adagsd flutter");
   socket.on("joinRoom", ({ username, room1, room2 }) => {
     console.log("room joined");
     console.log(username);
@@ -86,24 +95,26 @@ io.on("connection", (socket) => {
   });
 
   // Runs when client disconnects
-  socket.on("disconnect", () => {
-    const user = userLeave(socket.id);
+  // socket.on("disconnect", () => {
+  //   const user = userLeave(socket.id);
 
-    if (user) {
-      io.to(user.room1, user.room2).emit(
-        "message",
-        formatMessage(botName, `${user.username} has left the chat`)
-      );
+  //   if (user) {
+  //     io.to(user.room1, user.room2).emit(
+  //       "message",
+  //       formatMessage(botName, `${user.username} has left the chat`)
+  //     );
 
-      // Send users and room info
-      io.to(user.room1, user.room2).emit("roomUsers", {
-        room1: user.room1,
-        room2: user.room2,
-        users: getRoomUsers(user.room1, user.room2),
-      });
-    }
-  });
+  //     // Send users and room info
+  //     io.to(user.room1, user.room2).emit("roomUsers", {
+  //       room1: user.room1,
+  //       room2: user.room2,
+  //       users: getRoomUsers(user.room1, user.room2),
+  //     });
+  //   }
+  // });
 });
+
+// ! mine ===>>>>>
 // io.on("connection", (socket) => {
 //   console.log("connected with flutter socket......");
 
