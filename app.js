@@ -11,29 +11,123 @@ var clients = {};
 
 app.use(express.json());
 io.on("connection", (socket) => {
-  console.log("connected with flutter socket......");
+  console.log("connected with flutter");
+  socket.on("joinRoom", ({ username, room1, room2 }) => {
+    console.log("room joined");
+    console.log(username);
+    console.log(room1);
+    console.log(room2);
 
-  socket.on("signin", (id) => {
-    console.log(id);
-    clients[id] = socket;
+    // if (Number(room1) < Number(room2)) {
+
+    const user = userJoin(socket.id, username, room1, room2);
+    socket.join(user.room1, user.room2);
+
+    // Welcome current user
+    socket.emit("message", formatMessage(botName, "Welcome to Chat Server"));
+
+    // Broadcast when a user connects
+    socket.broadcast
+      .to(user.room1, user.room2)
+      .emit(
+        "message",
+        formatMessage(botName, `${user.username} has joined the chat`)
+      );
+
+    // Send users and room info
+    io.to(user.room1, user.room2).emit("roomUsers", {
+      room1: user.room1,
+      room2: user.room2,
+      users: getRoomUsers(user.room1, user.room2),
+    });
+    // } else {
+    //   console.log("hello from else part");
+    //   let s = room1;
+    //   room1 = room2;
+    //   room2 = s;
+    //   const user = userJoin(socket.id, username, room1, room2);
+    //   socket.join(user.room1, user.room2);
+
+    //   // Welcome current user
+    //   socket.emit("message", formatMessage(botName, "Welcome to Chat Server"));
+
+    //   // Broadcast when a user connects
+    //   socket.broadcast
+    //     .to(user.room1, user.room2)
+    //     .emit(
+    //       "message",
+    //       formatMessage(botName, `${user.username} has joined the chat`)
+    //     );
+
+    //   // Send users and room info
+    //   io.to(user.room1, user.room2).emit("roomUsers", {
+    //     room1: user.room1,
+    //     room2: user.room2,
+    //     users: getRoomUsers(user.room1, user.room2),
+    //   });
+    // }
   });
 
-  socket.on("message", (data) => {
-    const message = {
-      message: data.message,
-      senderUsername: data.sender,
-      sentAt: Date.now(),
-      senderId: data.receiverId,
-      receiverId: data.senderId,
-    };
-    messages.push(message);
-    let targetId = data.senderId;
-    if (clients[targetId]) clients[targetId].emit("message", message);
+  // Listen for chatMessage
+  socket.on("chatMessage", (msg) => {
+    console.log(msg);
+    const user = getCurrentUser(socket.id);
+
+    console.log(user.room1);
+    console.log(user.room2);
+
+    //! commented below line because it was sending to both the users........
+    // io.to(user.room1, user.room2).emit(
+    //   "message",
+    //   formatMessage(user.username, msg)
+    // );
+
+    io.to(user.room2).emit("message", formatMessage(user.username, msg));
+  });
+
+  // Runs when client disconnects
+  socket.on("disconnect", () => {
+    const user = userLeave(socket.id);
+
+    if (user) {
+      io.to(user.room1, user.room2).emit(
+        "message",
+        formatMessage(botName, `${user.username} has left the chat`)
+      );
+
+      // Send users and room info
+      io.to(user.room1, user.room2).emit("roomUsers", {
+        room1: user.room1,
+        room2: user.room2,
+        users: getRoomUsers(user.room1, user.room2),
+      });
+    }
   });
 });
+// io.on("connection", (socket) => {
+//   console.log("connected with flutter socket......");
+
+//   socket.on("signin", (id) => {
+//     console.log(id);
+//     clients[id] = socket;
+//   });
+
+//   socket.on("message", (data) => {
+//     const message = {
+//       message: data.message,
+//       senderUsername: data.sender,
+//       sentAt: Date.now(),
+//       senderId: data.receiverId,
+//       receiverId: data.senderId,
+//     };
+//     messages.push(message);
+//     let targetId = data.senderId;
+//     if (clients[targetId]) clients[targetId].emit("message", message);
+//   });
+// });
 
 app.get("/", (req, res) => {
-  res.send("<h1>Hello Express!</h1>");
+  res.send("<h1>Hello Express! socket</h1>");
 });
 
 app.get("/home", (req, res) => {
