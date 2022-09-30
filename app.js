@@ -20,7 +20,7 @@ const botName = "Some Bot";
 
 app.use(express.json());
 io.on("connection", (socket) => {
-  console.log("connected with adagsd flutter");
+  console.log("connected with  flutter");
   socket.on("joinRoom", ({ username, room1, room2 }) => {
     console.log("room joined");
     console.log(username);
@@ -33,15 +33,17 @@ io.on("connection", (socket) => {
     socket.join(user.room1, user.room2);
 
     // Welcome current user
-    socket.emit("message", formatMessage(botName, "Welcome to Chat Server"));
+    // !commented
+    // socket.emit("message", formatMessage(botName, "Welcome to Chat Server"));
 
     // Broadcast when a user connects
-    socket.broadcast
-      .to(user.room1, user.room2)
-      .emit(
-        "message",
-        formatMessage(botName, `${user.username} has joined the chat`)
-      );
+    //! commented below
+    // socket.broadcast
+    //   .to(user.room1, user.room2)
+    //   .emit(
+    //     "message",
+    //     formatMessage(botName, `${user.username} has joined the chat`)
+    //   );
 
     // Send users and room info
     io.to(user.room1, user.room2).emit("roomUsers", {
