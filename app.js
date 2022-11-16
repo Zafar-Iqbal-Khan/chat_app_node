@@ -96,6 +96,19 @@ io.on("connection", (socket) => {
     io.to(user.room2).emit("message", formatMessage(user.username, msg));
   });
 
+  //? listen for emojis
+  socket.on("emojiReaction", (msg) => {
+    console.log(msg);
+    const user = getCurrentUser(socket.id);
+
+    //! commented below line because it was sending to both the users........
+    // io.to(user.room1, user.room2).emit(
+    //   "message",
+    //   formatMessage(user.username, msg)
+    // );
+
+    io.to(user.room2).emit("emoji", formatMessage(user.username, msg));
+  });
   // Runs when client disconnects
   // socket.on("disconnect", () => {
   //   const user = userLeave(socket.id);
